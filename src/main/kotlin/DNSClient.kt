@@ -285,22 +285,15 @@ class DNSClient(
             val dataB = data.slice(i until i + dataLength)
 
             val dataAns = when (type) {
-                QType.A, QType.AAAA -> {
-                    var ind = 0
-                    val str = StringBuilder(dataB[ind].toUByte().toInt().toString())
-                    while (ind != dataB.size - 1) {
-                        ind++
-                        str.append(".")
-                        str.append(dataB[ind].toUByte().toInt().toString())
-                    }
-                    str.toString()
+                QType.AAAA, QType.A -> {
+                    val inetAdr = InetAddress.getByAddress(dataB.toByteArray())
+                    inetAdr.hostAddress
                 }
                 QType.MX -> {
                     val preference = dataB.slice(0..1).toInt()
                     val exchanger = parseDomainName(data, i + 2).first
                     "\tMX preference = $preference, exchanger = $exchanger"
                 }
-
                 QType.TXT -> {
                     val str = StringBuilder()
                     var ind = 0
