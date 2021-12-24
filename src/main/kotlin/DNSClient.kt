@@ -5,7 +5,7 @@ import kotlin.IllegalStateException
 import kotlin.system.exitProcess
 
 class DNSClient(
-    private val inetAddress: InetAddress = InetAddress.getByName("10.0.0.1"), //InetAddress.getLocalHost(),
+    private val inetAddress: InetAddress = InetAddress.getByName("10.0.0.1"),
     private val port: Int = 53
 ) {
     private val socket = DatagramSocket()
@@ -35,7 +35,7 @@ class DNSClient(
                 continue
             }
 
-            val qType = when (commandI) {  //проверять на int
+            val qType = when (commandI) {
                 1 -> QType.A
                 15 -> QType.MX
                 16 -> QType.TXT
@@ -46,7 +46,7 @@ class DNSClient(
                 }
             }
 
-            var domain: String? = "google.com"
+            var domain: String? = ""
 
             var repeat = true
             while (repeat) {
@@ -71,11 +71,12 @@ class DNSClient(
         val sendBuff = header() + question
         val outputPacket = DatagramPacket(sendBuff, sendBuff.size, inetAddress, port)
         socket.send(outputPacket)
+        println("Отправлен запрос на $inetAddress:$port")
 
         waitAnswer(sendBuff.size - 1)    // Ждём ответ и обрабатываем его
     }
 
-    fun header(): ByteArray {
+    private fun header(): ByteArray {
         val requestNum = byteArrayOf(0.toByte(), 1.toByte())
         // формирование 2 "строки" заголовка
         val qr = QR.QUERY.code              // запрос
@@ -94,7 +95,7 @@ class DNSClient(
                 zero2byte + zero2byte + zero2byte
     }
 
-    private fun question(domainName: String = "google.com", qType: QType = QType.A): ByteArray {
+    private fun question(domainName: String, qType: QType): ByteArray {
         // Формируем QNAME
         val splitDomain = domainName.split(".")
         val arraysDomain = mutableListOf<ByteArray>()
