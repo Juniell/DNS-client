@@ -22,7 +22,11 @@ class DNSClient(
             println("1 - A\n15 - MX\n16 - TXT\n28 - AAAA")
 
             val command = readLine()
-            if (command.isNullOrEmpty()) {
+            if (command == null || command.startsWith("--stop")) {
+                println("Получена команда завершения работы.")
+                exitProcess(0)
+            }
+            if (command.isEmpty()) {
                 println("Введена некорректная команда")
                 continue
             }
@@ -52,8 +56,10 @@ class DNSClient(
             while (repeat) {
                 println("Введите доменное имя:")
                 domain = readLine()
-                if (domain == null || domain.startsWith("--stop"))
+                if (domain == null || domain.startsWith("--stop")) {
+                    println("Получена команда завершения работы.")
                     exitProcess(0)
+                }
                 if (domain.isEmpty()) {
                     println("Введено некорректное доменное имя")
                     continue
